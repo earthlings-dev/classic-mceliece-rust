@@ -6,7 +6,7 @@ use crate::{
     params::{PK_NROWS, PK_ROW_BYTES, SYND_BYTES, SYS_N, SYS_T},
     util::load_gf,
 };
-use rand::{CryptoRng, RngCore};
+use rand::CryptoRng;
 
 /// Takes two 16-bit integers and determines whether they are equal (u8::MAX) or different (0)
 fn same_mask_u8(x: u16, y: u16) -> u8 {
@@ -22,7 +22,7 @@ fn same_mask_u8(x: u16, y: u16) -> u8 {
 /// Does not take any input arguments.
 /// If generation of pseudo-random numbers fails, an error is returned.
 #[cfg(not(any(feature = "mceliece8192128", feature = "mceliece8192128f")))]
-fn gen_e<R: CryptoRng + RngCore>(e: &mut [u8; SYS_N / 8], rng: &mut R) {
+fn gen_e<R: CryptoRng>(e: &mut [u8; SYS_N / 8], rng: &mut R) {
     let mut ind = [0u16; SYS_T];
     let mut val = [0u8; SYS_T];
 
@@ -88,7 +88,7 @@ fn gen_e<R: CryptoRng + RngCore>(e: &mut [u8; SYS_N / 8], rng: &mut R) {
 /// Does not take any input arguments.
 /// If generation of pseudo-random numbers fails, an error is returned.
 #[cfg(any(feature = "mceliece8192128", feature = "mceliece8192128f"))]
-fn gen_e<R: CryptoRng + RngCore>(e: &mut [u8], rng: &mut R) {
+fn gen_e<R: CryptoRng>(e: &mut [u8], rng: &mut R) {
     let mut ind = [0u16; SYS_T];
     let mut bytes = [0u8; SYS_T * 2];
     let mut val = [0u8; SYS_T];
@@ -219,7 +219,7 @@ fn syndrome(
 
 /// Encryption routine.
 /// Takes a public key `pk` to compute error vector `e` and syndrome `s`.
-pub(crate) fn encrypt<R: CryptoRng + RngCore>(
+pub(crate) fn encrypt<R: CryptoRng>(
     s: &mut [u8; CRYPTO_CIPHERTEXTBYTES],
     pk: &[u8; PK_NROWS * PK_ROW_BYTES],
     e: &mut [u8; SYS_N / 8],

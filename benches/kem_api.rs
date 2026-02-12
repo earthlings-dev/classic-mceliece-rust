@@ -1,11 +1,13 @@
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use std::hint::black_box;
+
+use criterion::{Criterion, criterion_group, criterion_main};
 use criterion_cycles_per_byte::CyclesPerByte;
 
-use classic_mceliece_rust::{decapsulate, encapsulate, keypair, CRYPTO_BYTES};
+use classic_mceliece_rust::{CRYPTO_BYTES, decapsulate, encapsulate, keypair};
 use classic_mceliece_rust::{CRYPTO_PUBLICKEYBYTES, CRYPTO_SECRETKEYBYTES};
 
 pub fn bench_complete_kem(criterion: &mut Criterion<CyclesPerByte>) {
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
     let mut sk_buf = [0u8; CRYPTO_SECRETKEYBYTES];
     let mut ss_buf_bob = [0u8; CRYPTO_BYTES];
     let mut ss_buf_alice = [0u8; CRYPTO_BYTES];
@@ -34,7 +36,7 @@ pub fn bench_complete_kem(criterion: &mut Criterion<CyclesPerByte>) {
 }
 
 pub fn bench_kem_keypair(criterion: &mut Criterion<CyclesPerByte>) {
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
     let mut sk_buf = [0u8; CRYPTO_SECRETKEYBYTES];
     let mut pk_buf;
     #[cfg(feature = "alloc")]
@@ -55,7 +57,7 @@ pub fn bench_kem_keypair(criterion: &mut Criterion<CyclesPerByte>) {
 }
 
 pub fn bench_kem_enc(criterion: &mut Criterion<CyclesPerByte>) {
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
     let mut sk_buf = [0u8; CRYPTO_SECRETKEYBYTES];
     let mut ss_buf = [0u8; CRYPTO_BYTES];
     let mut pk_buf;
@@ -79,7 +81,7 @@ pub fn bench_kem_enc(criterion: &mut Criterion<CyclesPerByte>) {
 }
 
 pub fn bench_kem_dec(criterion: &mut Criterion<CyclesPerByte>) {
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
     let mut sk_buf = [0u8; CRYPTO_SECRETKEYBYTES];
     let mut ss_buf = [0u8; CRYPTO_BYTES];
     let mut pk_buf;

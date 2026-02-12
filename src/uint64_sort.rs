@@ -66,10 +66,8 @@ pub(crate) fn uint64_sort<const N: usize>(x: &mut [u64; N]) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use rand::Rng;
-
     fn gen_random_u64() -> u64 {
-        rand::thread_rng().gen::<u64>()
+        rand::random::<u64>()
     }
 
     #[test]

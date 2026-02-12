@@ -1,12 +1,10 @@
 //! Simple example illustrating shared key negotiation.
 
-use classic_mceliece_rust::{decapsulate, encapsulate, keypair};
 use classic_mceliece_rust::{CRYPTO_BYTES, CRYPTO_PUBLICKEYBYTES, CRYPTO_SECRETKEYBYTES};
-
-use rand::thread_rng;
+use classic_mceliece_rust::{decapsulate, encapsulate, keypair};
 
 fn main() {
-    let mut rng = thread_rng();
+    let mut rng = rand::rng();
 
     // key generation
     let mut pubkey_buf = [0u8; CRYPTO_PUBLICKEYBYTES]; // WARN: public keys are large - optionally use Box::new()!

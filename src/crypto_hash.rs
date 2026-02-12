@@ -1,7 +1,7 @@
 //! Hash function implementations (only SHAKE)
 
-use sha3::digest::ExtendableOutput;
 use sha3::Shake256;
+use sha3::digest::ExtendableOutput;
 
 /// Utilizes the SHAKE256 hash function. Input and output is of arbitrary length.
 #[inline]

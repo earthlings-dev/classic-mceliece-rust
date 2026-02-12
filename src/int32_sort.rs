@@ -65,10 +65,8 @@ pub(crate) fn int32_sort(x: &mut [i32]) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use rand::Rng;
-
     fn gen_random_i32() -> i32 {
-        rand::thread_rng().gen::<i32>()
+        rand::random::<i32>()
     }
 
     #[test]

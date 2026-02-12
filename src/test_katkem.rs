@@ -3,7 +3,7 @@
 use alloc::boxed::Box;
 use alloc::string::String;
 use alloc::string::ToString;
-use rand::RngCore;
+use rand::Rng;
 use std::error;
 use std::fmt;
 use std::fs;
@@ -13,11 +13,11 @@ use std::io::Write;
 
 use crate::nist_aes_rng::AesState;
 use crate::test_utils::TestData;
-use crate::{decapsulate, encapsulate, keypair, keypair_boxed};
 use crate::{
     CRYPTO_BYTES, CRYPTO_CIPHERTEXTBYTES, CRYPTO_PRIMITIVE, CRYPTO_PUBLICKEYBYTES,
     CRYPTO_SECRETKEYBYTES,
 };
+use crate::{decapsulate, encapsulate, keypair, keypair_boxed};
 
 /// We are trying to read the data/testdata.txt file.
 /// If there is some issue, we generate this error
@@ -430,12 +430,12 @@ fn katkem() {
 #[cfg(feature = "zeroize")]
 fn zeroize() {
     fn run_zeroize() {
-        use crate::{keypair, CRYPTO_PUBLICKEYBYTES, CRYPTO_SECRETKEYBYTES};
+        use crate::{CRYPTO_PUBLICKEYBYTES, CRYPTO_SECRETKEYBYTES, keypair};
 
         let mut pk_buffer = Box::new([0u8; CRYPTO_PUBLICKEYBYTES]);
         let mut sk_buffer = [5u8; CRYPTO_SECRETKEYBYTES];
 
-        let mut rng = rand::thread_rng();
+        let mut rng = rand::rng();
 
         let zeroed_pk_buffer = [0; CRYPTO_PUBLICKEYBYTES];
         let zeroed_key = [0; CRYPTO_SECRETKEYBYTES];
@@ -460,7 +460,7 @@ fn zeroize() {
 #[test]
 #[cfg(feature = "mceliece8192128f")]
 fn crypto_alloc_api_keypair() {
-    use crate::{keypair_boxed, CRYPTO_PUBLICKEYBYTES, CRYPTO_SECRETKEYBYTES};
+    use crate::{CRYPTO_PUBLICKEYBYTES, CRYPTO_SECRETKEYBYTES, keypair_boxed};
 
     let entropy_input = <[u8; 48]>::try_from(
         TestData::new()

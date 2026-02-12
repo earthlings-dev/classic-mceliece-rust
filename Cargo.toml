@@ -11,16 +11,17 @@ authors = [
     "Daniel Kales <daniel.kales@gmail.com>",
     "Linus Färnstrand",
 ]
-edition = "2021"
+edition = "2024"
 keywords = ["pqc", "post-quantum", "cryptography", "decoding"]
 categories = ["cryptography"]
 exclude = ["/data"]
+rust-version = "1.93"
 
 [dependencies]
-rand = { version = "0.8", default-features = false }
+rand = { version = "0.10", default-features = false }
 sha3 = { version = "0.10", default-features = false }
 kem = { version = "0.2", optional = true }
-zeroize = { version = "1.5", default-features = false, optional = true }
+zeroize = { version = "1.8", default-features = false, optional = true }
 
 [features]
 ## When adding features or changing the default features, remember to update
@@ -56,9 +57,9 @@ name = "kem_api"
 harness = false
 
 [dev-dependencies]
-rand = { version = "0.8", features = ["default"] }
-criterion = { version = "0.3", features = ["html_reports"] }
-criterion-cycles-per-byte = "0.1"
+rand = { version = "0.10", features = ["default"] }
+criterion = { version = "0.8", features = ["html_reports"] }
+criterion-cycles-per-byte = "0.8"
 aes = "0.8"
 hex = "0.4.3"
 
@@ -72,6 +73,10 @@ opt-level = 1 # reduces runtime for KATNUM=2 from 281s to 11s
 ## To use this locally, run: `RUSTDOCFLAGS="--cfg docsrs" cargo doc --features kem`.
 features = ["kem"]
 rustdoc-args = ["--cfg", "docsrs"]
+
+[patch.crates-io]
+rand = { path = "../rand" }
+rand_core = { path = "../rand_core" }
 
 [lints.clippy]
 needless_doctest_main = "allow"

@@ -4,14 +4,14 @@
 #![cfg(feature = "alloc")]
 
 use classic_mceliece_rust::{
-    decapsulate_boxed, encapsulate_boxed, keypair_boxed, Ciphertext, PublicKey, SharedSecret,
-    CRYPTO_CIPHERTEXTBYTES, CRYPTO_PUBLICKEYBYTES,
+    CRYPTO_CIPHERTEXTBYTES, CRYPTO_PUBLICKEYBYTES, Ciphertext, PublicKey, SharedSecret,
+    decapsulate_boxed, encapsulate_boxed, keypair_boxed,
 };
-use rand::thread_rng;
 use std::sync::mpsc::{self, Sender};
 use std::thread;
 
 type Error = Box<dyn std::error::Error>;
+type ServerMessage = (Box<[u8]>, Sender<Box<[u8]>>);
 
 fn main() -> Result<(), Error> {
     let mut server_sender = spawn_server();
@@ -31,7 +31,7 @@ fn main() -> Result<(), Error> {
     Ok(())
 }
 
-fn spawn_server() -> Sender<(Box<[u8]>, Sender<Box<[u8]>>)> {
+fn spawn_server() -> Sender<ServerMessage> {
     // Convert the bytes read from the client into a `PublicKey`
     fn parse_public_key(public_key_data: &mut [u8]) -> Result<PublicKey<'_>, Error> {
         let public_key_array = <&mut [u8; CRYPTO_PUBLICKEYBYTES]>::try_from(public_key_data)?;
@@ -41,7 +41,7 @@ fn spawn_server() -> Sender<(Box<[u8]>, Sender<Box<[u8]>>)> {
     fn handle_request(public_key: &mut [u8], response_sender: Sender<Box<[u8]>>) {
         match parse_public_key(public_key) {
             Ok(public_key) => {
-                let (ciphertext, shared_secret) = encapsulate_boxed(&public_key, &mut thread_rng());
+                let (ciphertext, shared_secret) = encapsulate_boxed(&public_key, &mut rand::rng());
                 println!(
                     "[server] computed shared secret {:?}",
                     hex::encode_upper(shared_secret.as_array())
@@ -52,7 +52,7 @@ fn spawn_server() -> Sender<(Box<[u8]>, Sender<Box<[u8]>>)> {
         }
     }
 
-    let (sender, receiver) = mpsc::channel::<(Box<[u8]>, Sender<Box<[u8]>>)>();
+    let (sender, receiver) = mpsc::channel::<ServerMessage>();
     thread::spawn(move || {
         for (mut public_key, response_sender) in receiver.iter() {
             handle_request(&mut public_key, response_sender);
@@ -62,16 +62,14 @@ fn spawn_server() -> Sender<(Box<[u8]>, Sender<Box<[u8]>>)> {
 }
 
 /// Negotiate with `server` and return the shared secret.
-fn run_client(
-    server: &mut Sender<(Box<[u8]>, Sender<Box<[u8]>>)>,
-) -> Result<SharedSecret<'static>, Error> {
+fn run_client(server: &mut Sender<ServerMessage>) -> Result<SharedSecret<'static>, Error> {
     // Convert the bytes read from the server into a `Ciphertext`
     fn parse_ciphertext(ciphertext_data: &[u8]) -> Result<Ciphertext, Error> {
         let ciphertext_array = <[u8; CRYPTO_CIPHERTEXTBYTES]>::try_from(ciphertext_data)?;
         Ok(Ciphertext::from(ciphertext_array))
     }
 
-    let (public_key, secret_key) = keypair_boxed(&mut thread_rng());
+    let (public_key, secret_key) = keypair_boxed(&mut rand::rng());
 
     // Send the public key to the server
     let (response_sender, response_receiver) = mpsc::channel();

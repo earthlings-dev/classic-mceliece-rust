@@ -1,7 +1,7 @@
 //! This file is for evaluating a polynomial at one or more field elements
 
 use crate::{
-    gf::{gf_add, gf_mul, Gf},
+    gf::{Gf, gf_add, gf_mul},
     params::{SYS_N, SYS_T},
 };
 

@@ -1,7 +1,7 @@
 #![cfg(all(test, feature = "kem"))]
 
 use crate::nist_aes_rng::AesState;
-use crate::{Ciphertext, CRYPTO_CIPHERTEXTBYTES};
+use crate::{CRYPTO_CIPHERTEXTBYTES, Ciphertext};
 use kem::generic_array::GenericArray;
 use kem::{Decapsulator, EncappedKey, Encapsulator};
 

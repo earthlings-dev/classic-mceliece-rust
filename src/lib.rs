@@ -27,7 +27,7 @@ mod uint64_sort;
 mod util;
 
 use core::fmt::Debug;
-use rand::{CryptoRng, RngCore};
+use rand::CryptoRng;
 
 #[cfg(feature = "alloc")]
 extern crate alloc;
@@ -327,7 +327,7 @@ impl Drop for SharedSecret<'_> {
 /// Generate a public and secret key.
 /// The public key is meant to be shared with any party,
 /// but access to the secret key must be limited to the generating party.
-pub fn keypair<'public, 'secret, R: CryptoRng + RngCore>(
+pub fn keypair<'public, 'secret, R: CryptoRng>(
     public_key_buf: &'public mut [u8; CRYPTO_PUBLICKEYBYTES],
     secret_key_buf: &'secret mut [u8; CRYPTO_SECRETKEYBYTES],
     rng: &mut R,
@@ -344,9 +344,7 @@ pub fn keypair<'public, 'secret, R: CryptoRng + RngCore>(
 /// and returns them with the ``'static`` lifetime.
 #[cfg(feature = "alloc")]
 #[cfg_attr(docsrs, doc(cfg(feature = "alloc")))]
-pub fn keypair_boxed<R: CryptoRng + RngCore>(
-    rng: &mut R,
-) -> (PublicKey<'static>, SecretKey<'static>) {
+pub fn keypair_boxed<R: CryptoRng>(rng: &mut R) -> (PublicKey<'static>, SecretKey<'static>) {
     let mut public_key_buf = util::alloc_boxed_array::<CRYPTO_PUBLICKEYBYTES>();
     let mut secret_key_buf = util::alloc_boxed_array::<CRYPTO_SECRETKEYBYTES>();
 
@@ -364,7 +362,7 @@ pub fn keypair_boxed<R: CryptoRng + RngCore>(
 /// The returned ciphertext should be sent back to the entity holding
 /// the secret key corresponding to public key given here, so they can compute
 /// the same shared key.
-pub fn encapsulate<'shared_secret, R: CryptoRng + RngCore>(
+pub fn encapsulate<'shared_secret, R: CryptoRng>(
     public_key: &PublicKey<'_>,
     shared_secret_buf: &'shared_secret mut [u8; CRYPTO_BYTES],
     rng: &mut R,
@@ -386,7 +384,7 @@ pub fn encapsulate<'shared_secret, R: CryptoRng + RngCore>(
 /// and returns it with the ``'static`` lifetime.
 #[cfg(feature = "alloc")]
 #[cfg_attr(docsrs, doc(cfg(feature = "alloc")))]
-pub fn encapsulate_boxed<R: CryptoRng + RngCore>(
+pub fn encapsulate_boxed<R: CryptoRng>(
     public_key: &PublicKey<'_>,
     rng: &mut R,
 ) -> (Ciphertext, SharedSecret<'static>) {
@@ -441,12 +439,12 @@ pub fn decapsulate_boxed(ciphertext: &Ciphertext, secret_key: &SecretKey) -> Sha
 
 #[cfg(feature = "kem")]
 mod kem_api {
-    use kem::generic_array::{typenum, GenericArray};
+    use kem::generic_array::{GenericArray, typenum};
     use kem::{Decapsulator, EncappedKey, Encapsulator, SharedSecret};
-    use rand::{CryptoRng, RngCore};
+    use rand::CryptoRng;
 
-    use crate::{Ciphertext, PublicKey, SecretKey};
     use crate::{CRYPTO_BYTES, CRYPTO_CIPHERTEXTBYTES};
+    use crate::{Ciphertext, PublicKey, SecretKey};
 
     /// A struct for encapsulating a shared key using Classic McEliece.
     #[derive(Debug)]
@@ -454,7 +452,7 @@ mod kem_api {
     pub struct ClassicMcEliece;
 
     impl Encapsulator<Ciphertext> for ClassicMcEliece {
-        fn try_encap<R: CryptoRng + RngCore>(
+        fn try_encap<R: CryptoRng>(
             &self,
             csprng: &mut R,
             recip_pubkey: &<Ciphertext as EncappedKey>::RecipientPublicKey,
