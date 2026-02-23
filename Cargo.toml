@@ -75,8 +75,8 @@ features = ["kem"]
 rustdoc-args = ["--cfg", "docsrs"]
 
 [patch.crates-io]
-rand = { git = "https://github.com/earthlings-dev/rand.git" }
-rand_core = { git = "https://github.com/earthlings-dev/rand_core.git" }
+rand = { path = "../rand" }
+rand_core = { path = "../rand_core" }
 
 [lints.clippy]
 needless_doctest_main = "allow"
